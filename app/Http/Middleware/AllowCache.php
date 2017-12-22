@@ -4,17 +4,29 @@ namespace App\Http\Middleware;
 
 use Closure;
 
+/**
+ * Modify request header
+ *
+ * @ copyright Copyright (c) 2017 ngo.dinh.ngoc
+ */
 class AllowCache
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request $request
+     * @param  Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        return $next($request);
+        $response = $next($request);
+
+        if (!$response->isRedirect()) {
+            // TODO https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+            $response->header('Cache-Control: no-cache, no-store, must-revalidate', true);
+        }
+
+        return $response;
     }
 }
